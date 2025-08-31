@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Camera, RotateCcw, Download, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,6 +19,7 @@ export default function CameraPage() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState('none');
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [photoNotes, setPhotoNotes] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
@@ -89,6 +91,7 @@ export default function CameraPage() {
 
   const retakePhoto = () => {
     setPhoto(null);
+    setPhotoNotes('');
     startCamera();
   };
 
@@ -103,7 +106,7 @@ export default function CameraPage() {
         photo,
         date: new Date().toISOString(),
         filter: selectedFilter,
-        notes: ''
+        notes: photoNotes
       };
       
       // Save to localStorage
@@ -114,6 +117,9 @@ export default function CameraPage() {
         title: "Memory Saved! 📸",
         description: "Your photo has been added to your scrapebook",
       });
+      
+      // Reset notes
+      setPhotoNotes('');
       
       // Navigate to scrapebook
       navigate('/scrapebook');
@@ -181,6 +187,20 @@ export default function CameraPage() {
                     year: 'numeric' 
                   })}
                 </p>
+              </div>
+              
+              {/* Notes Input */}
+              <div className="bg-card rounded-lg p-4">
+                <label htmlFor="photo-notes" className="block text-sm font-medium mb-2">
+                  Add a note about this memory
+                </label>
+                <Textarea
+                  id="photo-notes"
+                  placeholder="What made this moment special?"
+                  value={photoNotes}
+                  onChange={(e) => setPhotoNotes(e.target.value)}
+                  className="min-h-[100px] font-handwritten text-lg"
+                />
               </div>
               
               <div className="flex gap-3 justify-center">
