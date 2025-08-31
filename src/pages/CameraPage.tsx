@@ -26,14 +26,27 @@ export default function CameraPage() {
   const startCamera = useCallback(async () => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: 1280, height: 720 }
+        video: { 
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
       });
       setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
       setIsCameraActive(true);
+      
+      // Wait for next tick to ensure video element is mounted
+      setTimeout(() => {
+        if (videoRef.current && mediaStream) {
+          videoRef.current.srcObject = mediaStream;
+          // Ensure video plays
+          videoRef.current.play().catch(e => {
+            console.error('Error playing video:', e);
+          });
+        }
+      }, 100);
     } catch (error) {
+      console.error('Camera error:', error);
       toast({
         title: "Camera Error",
         description: "Unable to access camera. Please check permissions.",
